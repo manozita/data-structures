@@ -1,3 +1,0 @@
-/Users/manoela/Documents/data-structures/cmake-build-debug/CMakeFiles/data_structures.dir
-/Users/manoela/Documents/data-structures/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/manoela/Documents/data-structures/cmake-build-debug/CMakeFiles/rebuild_cache.dir

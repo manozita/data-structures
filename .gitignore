@@ -1,0 +1,31 @@
+### C Lion ###
+# ignore build directories
+cmake-build-debug/
+cmake-build-release/
+
+# ignore CLion project files
+.idea/
+
+# ignore compiled object files
+*.o
+*.obj
+
+# ignore executable files
+*.exe
+*.out
+*.app
+
+# ignore libraries
+*.lib
+*.a
+*.so
+*.dll
+*.dylib
+
+# ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+### MacOs ###
+.DS_Store

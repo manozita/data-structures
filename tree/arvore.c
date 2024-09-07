@@ -23,12 +23,14 @@ Arvore construirArvoreRam(int);                 // Constrói árvore perfeitamen
 int    obterAltura(Arvore);                     // Devolve a altura da árvore
 int    contarNos(Arvore);                       // Devolve a quantidade de nós da árvore
 
-void   mostrarArvoreRECeRd(Arvore);             // Mostra uma árvore recursivamente pelo caminhamento eRd
-void   mostrarArvoreRECRed(Arvore);             // Mostra uma árvore recursivamente pelo caminhamento Red
-void   mostrarArvoreRECedR(Arvore);             // Mostra uma árvore recursivamente pelo caminhamento edR
-void   mostrarArvorebfs(Arvore);                // Mostra uma árvore pelo caminhamento bfs usando fila auxiliar
+void   mostrarArvore_eRd(Arvore ap);            // Mostra uma árvore não recursivamente pelo caminhamento eRd
 
-void   mostrarPrimeiroeRd(Arvore);              // Mostra o primeiro nó visitado numa árvore binária pelo caminhamento eRd
+void   mostrarArvore_Rec_eRd(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento eRd
+void   mostrarArvore_Rec_Red(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento Red
+void   mostrarArvore_Rec_edR(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento edR
+void   mostrarArvore_bfs(Arvore);               // Mostra uma árvore pelo caminhamento bfs usando fila auxiliar
+
+void   mostrarPrimeiro_eRd(Arvore);             // Mostra o primeiro nó visitado numa árvore binária pelo caminhamento eRd
 
 
 
@@ -62,13 +64,12 @@ Arvore construirExemplo() {
 }
 
 Arvore construirArvoreRam(int n) {
-    //srand(time(NULL)); // Inicia o gerador de números aleatórios
     Arvore a;
     if (n != 0) {
-        int n1, n2; // Tamanho dos nós filhos
-        n1 = n/2; n2 = n - n1;
-        //a = construirArvore(rand()%100, construirArvoreRam(n1), construirArvoreRam(n2));
-        a = construirArvore(2, construirArvoreRam(n1), construirArvoreRam(n2));
+        int n1, n2, el; // Tamanho dos nós filhos
+        n1 = n/2; n2 = n - n1 -1;
+        el = rand()%50;
+        a = construirArvore(el, construirArvoreRam(n1), construirArvoreRam(n2));
     } else {
         a = NULL;
     }
@@ -100,31 +101,44 @@ int contarNos(Arvore ap) {
 
 
 
-void mostrarArvoreRECeRd(Arvore ap) {
+void mostrarArvore_Rec_eRd(Arvore ap) {
     if (ap != NULL) { // Se o apontador não for vazio
-        mostrarArvoreRECeRd(ap->esq);
+        mostrarArvore_Rec_eRd(ap->esq);
         printf("%d ", ap->elemento);
-        mostrarArvoreRECeRd(ap->dir);
+        mostrarArvore_Rec_eRd(ap->dir);
     }
 }
 
-void mostrarArvoreRECRed(Arvore ap) {
-    if (ap != NULL) { // Se o apontador não for vazio
-        printf("%d ", ap->elemento);
-        mostrarArvoreRECRed(ap->esq);
-        mostrarArvoreRECRed(ap->dir);
+void mostrarArvore_eRd(Arvore ap) {
+    Pilha p;
+    if (ap != NULL) {
+        criarPilhaVazia(&p);
+        do {
+            while (ap -> dir != NULL) {
+                ap = ap -> dir;
+            }
+            pushPilha(&p, &ap->elemento);
+        } while (!verificarPilhaVazia(&p));
     }
 }
 
-void mostrarArvoreRECedR(Arvore ap) {
+void mostrarArvore_Rec_Red(Arvore ap) {
     if (ap != NULL) { // Se o apontador não for vazio
-        mostrarArvoreRECedR(ap->esq);
-        mostrarArvoreRECedR(ap->dir);
+        printf("%d ", ap->elemento);
+        mostrarArvore_Rec_Red(ap->esq);
+        mostrarArvore_Rec_Red(ap->dir);
+    }
+}
+
+void mostrarArvore_Rec_edR(Arvore ap) {
+    if (ap != NULL) { // Se o apontador não for vazio
+        mostrarArvore_Rec_edR(ap->esq);
+        mostrarArvore_Rec_edR(ap->dir);
         printf("%d ", ap->elemento);
     }
 }
 
-void mostrarArvorebfs(Arvore ap) {
+void mostrarArvore_bfs(Arvore ap) {
     No *p;  Fila f;
     if (ap != NULL) { // Se o apontador não for vazio
         criarFilaVazia(&f); p = ap; pushFila(&f,p); // Cria uma nova fila e insere o nó raiz da árvore
@@ -142,7 +156,7 @@ void mostrarArvorebfs(Arvore ap) {
     }
 }
 
-void   mostrarPrimeiroeRd(Arvore ap) { // Vai tudo pra esquerda até encontrar o primeiro elemento
+void   mostrarPrimeiro_eRd(Arvore ap) { // Vai tudo pra esquerda até encontrar o primeiro elemento
     No *p;
     if (ap != NULL) {
         p = ap;
@@ -163,32 +177,33 @@ int main () {
     printf("Altura da árvore A: %d", obterAltura(a));
     printf("Quantidade de nós A: %d", contarNos(a));
     printf("\nCaminhamento eRd recursivo A: \n");
-    mostrarArvoreRECeRd(a); // Esperado: 4,2,5,1,6,3,7
+    mostrarArvore_Rec_eRd(a); // Esperado: 4,2,5,1,6,3,7
     printf("\nPrimeiro elemento eRd A: \n");
-    mostrarPrimeiroeRd(a);  // Esperado: 4
+    mostrarPrimeiro_eRd(a);  // Esperado: 4
     printf("\nCaminhamento Red recursivo A: \n");
-    mostrarArvoreRECRed(a); // Esperado: 1,2,4,5,3,6,7
-    printf("\nCaminhamento Red recursivo A: \n");
-    mostrarArvoreRECedR(a); // Esperado: 4,5,2,6,7,3,1
+    mostrarArvore_Rec_Red(a); // Esperado: 1,2,4,5,3,6,7
+    printf("\nCaminhamento edR recursivo A: \n");
+    mostrarArvore_Rec_edR(a); // Esperado: 4,5,2,6,7,3,1
     printf("\nCaminhamento bfs com fila auxiliar A: \n");
-    mostrarArvorebfs(a);    // Esperado: 1,2,3,4,5,6,7
+    mostrarArvore_bfs(a);    // Esperado: 1,2,3,4,5,6,7
     free(a);
 
     Arvore b;
+    srand(time(NULL)); // Inicia o gerador de números aleatórios para construirArvoreRam
     b = construirArvoreRam(15);
     if (b != NULL) {
         printf("\n\nAltura da árvore B: %d", obterAltura(b));
-        printf("Quantidade de nós B: %d", contarNos(b));
+        printf("\nQuantidade de nós B: %d", contarNos(b));
         printf("\nCaminhamento eRd recursivo B: \n");
-        mostrarArvoreRECeRd(b); // Esperado: 4,2,5,1,6,3,7
+        mostrarArvore_Rec_eRd(b);
         printf("\nPrimeiro elemento eRd B: \n");
-        mostrarPrimeiroeRd(b);  // Esperado: 4
+        mostrarPrimeiro_eRd(b);
         printf("\nCaminhamento Red recursivo B: \n");
-        mostrarArvoreRECRed(b); // Esperado: 1,2,4,5,3,6,7
-        printf("\nCaminhamento Red recursivo B: \n");
-        mostrarArvoreRECedR(b); // Esperado: 4,5,2,6,7,3,1
+        mostrarArvore_Rec_Red(b);
+        printf("\nCaminhamento edR recursivo B: \n");
+        mostrarArvore_Rec_edR(b);
         printf("\nCaminhamento bfs com fila auxiliar B: \n");
-        mostrarArvorebfs(b);    // Esperado: 1,2,3,4,5,6,7
+        mostrarArvore_bfs(b);
         free(b);
     }
     return 0;

@@ -23,7 +23,7 @@ Arvore construirArvoreRam(int);                 // Constrói árvore perfeitamen
 
 // --> Recursivo
 int    obterAltura_rec(Arvore);                 // Devolve a altura da árvore, recursivamente
-int    contarNos(Arvore);                       // Devolve a quantidade de nós da árvore, recursivo
+int    contarNos_rec(Arvore);                   // Devolve a quantidade de nós da árvore, recursivo
 void   mostrarArvore_rec_eRd(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento eRd
 void   mostrarArvore_rec_edR(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento edR
 void   mostrarArvore_rec_Red(Arvore);           // Mostra uma árvore recursivamente pelo caminhamento Red
@@ -31,6 +31,7 @@ No    *buscar_rec(Arvore, int);                 // Devolve o nó que contém o v
 
 // --> Não recursivo
 int    obterAltura(Arvore);                     // Devolve a altura da árvore, não recursivamente
+int    contarNos(Arvore ap);                    // Devolve a quantidade de nós da árvore
 void   mostrarArvore_eRd(Arvore ap);            // Mostra uma árvore não recursivamente pelo caminhamento eRd
 void   mostrarArvore_Red(Arvore);               // Mostra uma árvore não recursivamente pelo caminhamento Red
 void   mostrarArvore_bfs(Arvore);               // Mostra uma árvore pelo caminhamento bfs usando fila auxiliar
@@ -88,11 +89,14 @@ Arvore construirArvoreRam(int n) {
 int obterAltura_rec(Arvore ap) {
     int altura;
     if (ap != NULL) {
+        int aEsq, aDir;
+        aEsq = obterAltura_rec(ap->esq);
+        aDir = obterAltura_rec(ap->dir);
         // A altura esquerda é maior que a direita? Soma a maior altura à var altura
-        if (obterAltura_rec(ap->esq) > obterAltura_rec(ap->dir)) {
-            altura = obterAltura_rec(ap->esq);
+        if (aEsq > aDir) {
+            altura = aEsq;
         } else {
-            altura = obterAltura_rec(ap->dir);
+            altura = aDir;
         }
         altura++; // Soma 1 à altura
     } else { // Árvore vazia
@@ -122,14 +126,47 @@ int obterAltura(Arvore ap) { // Não recursivamente, usando o caminhamento BFS !
     return altura;
 }
 
-int contarNos(Arvore ap) {
+int contarNos_rec(Arvore ap) {
     int quantidadeNos; // A quantidade de nós = quantidade de nós esquerdos + direitos + o nó atual
     if (ap != NULL) {
-        quantidadeNos = 1 + contarNos(ap->esq) + contarNos(ap->dir);
+        quantidadeNos = 1 + contarNos_rec(ap->esq) + contarNos_rec(ap->dir);
     } else {
         quantidadeNos = 0; // Árvore vazia tem 0 nós
     }
     return quantidadeNos;
+}
+
+int contarNos(Arvore ap) {
+    int quantidadeNos = 0; // A quantidade de nós = quantidade de nós esquerdos + direitos + o nó atual
+    if (ap != NULL) {
+        No *p = ap;
+        Fila f; criarFilaVazia(&f); pushFila(&f, p);
+        do {
+            p = acessarFila(&f);
+            popFila(&f);
+            quantidadeNos++;
+
+            if (p->esq != NULL) {
+                pushFila(&f, p->esq);
+            }
+            if (p->dir != NULL) {
+                pushFila(&f, p->dir);
+            }
+        } while (!verificarFilaVazia(&f));
+    }
+    return quantidadeNos;
+}
+
+int contarFolhas_rec (Arvore ap) {
+    int numFolhas;
+    if (ap == NULL) {
+        numFolhas = 0;
+    } else if (ap->esq == NULL && ap->dir == NULL) {
+        numFolhas = 1;
+    } else {
+        numFolhas = contarFolhas_rec(ap->esq) + contarFolhas_rec(ap->dir);
+    }
+    return numFolhas;
 }
 
 
@@ -251,6 +288,27 @@ No *buscar_rec(Arvore ap, int el) {
     return p;
 }
 
+No *buscar(Arvore ap, int el) {
+    No *p; Fila f;
+    if (ap == NULL || ap->elemento == el) { // Se o elemento for a raiz da árvore ou a árvore for vazia
+        p = ap;
+    } else {
+        p = ap;
+        criarFilaVazia(&f); pushFila(&f,p);
+        do {
+            p = acessarFila(&f);
+            popFila(&f);
+            if (p->esq!=NULL) pushFila(&f,p->esq);
+            if (p->dir!=NULL) pushFila(&f,p->dir);
+        } while (!verificarFilaVazia(&f) || p->elemento != el);
+        p = buscar_rec(ap->esq,el); // Busca o elemento na esquerda da árvore
+        if (p == NULL) { // Se o elemento não estiver presente na esquerda da árvore
+            p = buscar_rec(ap->dir,el); // Busca o elemento na direita da árvore
+        }
+    }
+    return p;
+}
+
 No *obterSeguinte_eRd(Arvore ap, int el) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     No *no = ap;
     No *ant;
@@ -283,7 +341,7 @@ int main () {
     Arvore a;
     a = construirExemplo();
     printf("Altura da árvore A: %d", obterAltura_rec(a));
-    printf("Quantidade de nós A: %d", contarNos(a));
+    printf("Quantidade de nós A: %d", contarNos_rec(a));
     printf("\nCaminhamento eRd recursivo A: \n");
     mostrarArvore_rec_eRd(a); // Esperado: 4,2,5,1,6,3,7
     printf("\nPrimeiro elemento eRd A: \n");
@@ -302,7 +360,7 @@ int main () {
     b = construirArvoreRam(15);
     if (b != NULL) {
         printf("\n\nAltura da árvore B: %d", obterAltura_rec(b));
-        printf("\nQuantidade de nós B: %d", contarNos(b));
+        printf("\nQuantidade de nós B: %d", contarNos_rec(b));
         printf("\nCaminhamento eRd recursivo B: \n");
         mostrarArvore_rec_eRd(b);
         printf("\nPrimeiro elemento eRd B: \n");

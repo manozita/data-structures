@@ -7,4 +7,6 @@ add_executable(data_structures
         tree/arvore.c
     README.md
         stack-queue/FilaPointer.h
-        stack-queue/PilhaPointer.h)
+        stack-queue/PilhaPointer.h
+        linked-list/ListaLigada.h
+)

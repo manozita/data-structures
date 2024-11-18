@@ -19,11 +19,11 @@ unsigned long long karatsuba (unsigned long long x, unsigned long long y) {
     unsigned long long 
     result, n, pot, a, b, c, d, p, q, ac, bd, pq, adbc;
 
-    if (x < 10 || y < 10) {
+    n = fmax(numDigitos(x), numDigitos(y)); // assumindo que n é pot de 2
+
+    if (n == 1) {
         result = x*y;
     } else {
-        n = fmax(numDigitos(x), numDigitos(y)); // assumindo que n é pot de 2
-        
         pot = pow(10, n/2);         // pot = 10^{n/2}
         a = x / pot; b = x % pot;   // dividir dígitos de x pela metade em a e b
         c = y / pot; d = y % pot;   // dividir dígitos de y pela metade em c e d
@@ -43,7 +43,13 @@ unsigned long long karatsuba (unsigned long long x, unsigned long long y) {
 }
 
 unsigned long long numDigitos(unsigned long long num) {
-    return log10(num) + 1;
+    unsigned long long digitos;
+    if (num != 0) {
+        digitos = log10(num) + 1;
+    } else {
+        digitos = 1;
+    }
+    return digitos;
 }
 
 int main() {
